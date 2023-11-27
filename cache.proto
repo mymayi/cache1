@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package cache;
+
+
+// The greeting service definition.
+service Cache {
+  rpc post(Key_Value) returns (PostReply){}
+  rpc get(Key) returns (GetReply){}
+  rpc delete(Key) returns (DeleteReply){}
+}
+
+message Key{
+  string key=1;
+}
+
+message Key_Value{
+  string key=1;
+  string value=2;
+}
+
+message PostReply{
+  bool post_reply=1;
+}
+
+message GetReply{
+   string get_reply=1;
+   bool in_cache=2;
+}
+
+message DeleteReply{
+  bool delete_reply=1;
+}
+
+
