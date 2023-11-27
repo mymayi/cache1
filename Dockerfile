@@ -55,4 +55,4 @@ COPY . /app
 
 RUN pip install -r /app/requirements.txt
 
-CMD ["python3","server.py","${FLASK_PORT}"]
+CMD ["python3","server.py"]
