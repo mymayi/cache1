@@ -50,15 +50,8 @@ RUN rm -rf /tmp/Python-3.11.0
 RUN rm -f /tmp/Python-3.11.0.tgz
 RUN rm -f get-pip.py
 
-# 验证Python和pip版本
-RUN python3.11 --version
-RUN pip3.11 --version
-
-
 WORKDIR /app
 COPY . /app
-
-RUN apt-get install iputils-ping -y
 
 RUN pip install -r /app/requirements.txt
 
