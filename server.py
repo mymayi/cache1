@@ -7,13 +7,14 @@ import logging
 import grpc
 import cache_pb2
 import cache_pb2_grpc
+import os
 from werkzeug.serving import make_server
 import concurrent.futures
 
 app = Flask(__name__)
 DEFAULT_PORT = 9527
 RPC_PORT = 5000
-
+cs_num = 3
 
 def crc16_hash(key):
     crc = zlib.crc32(key)
@@ -155,8 +156,7 @@ def grpc_launch(r1_port):
 
 
 if __name__ == '__main__':
-    port = int(sys.argv[1])
-    cs_num = int(sys.argv[2])
+    port = os.environ.get('FLASK_PORT')
     base_port = DEFAULT_PORT  # http服务的端口
     r_port = port - DEFAULT_PORT + RPC_PORT  # rpc服务的端口
     with concurrent.futures.ThreadPoolExecutor() as executor:  # 多线程启动HTTP和rpc服务
