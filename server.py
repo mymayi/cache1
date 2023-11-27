@@ -32,8 +32,8 @@ cache = {}
 @app.route('/<key>', methods=['GET'])
 def get_op(key):
     target_port = crc16_hash(key.encode()) % cs_num + base_port
-    rpc_port = target_port - base_port + RPC_PORT
-    rpc_address = f"localhost:{rpc_port}"
+    cs_address = 9 + target_port - base_port
+    rpc_address = f'service_952{cs_address}:50051'
     print(f"GET \"{key}\"")
     if target_port != port:
         print(f"MOVED To Server {target_port}")
@@ -62,8 +62,8 @@ def post_op():
     print(key)
     print(f"POST \"{key}\": {value}")
     target_port = crc16_hash(key.encode()) % cs_num + base_port
-    rpc_port = target_port - base_port + RPC_PORT
-    rpc_address = f"localhost:{rpc_port}"
+    cs_address = 9 + target_port - base_port
+    rpc_address = f'service_952{cs_address}:50051'
     if target_port != port:
         print(f"MOVED To Server {target_port}")
         try:
@@ -86,8 +86,8 @@ def post_op():
 @app.route('/<key>', methods=['DELETE'])
 def delete_op(key):
     target_port = crc16_hash(key.encode()) % cs_num + base_port
-    rpc_port = target_port - base_port + RPC_PORT
-    rpc_address = f"localhost:{rpc_port}"
+    cs_address = 9 + target_port - base_port
+    rpc_address = f'service_952{cs_address}:50051'
     print(f"DELETE \"{key}\"")
     if target_port != port:
         print(f"MOVED To Server {target_port}")
@@ -133,12 +133,12 @@ class CacheServicerSelf(cache_pb2_grpc.CacheServicer):
             return cache_pb2.DeleteReply(delete_reply=False)
 
 
-def create_rpc_serve(r2_port):
+def create_rpc_serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     cache_pb2_grpc.add_CacheServicer_to_server(
         CacheServicerSelf(), server
     )
-    this_port = f"[::]:{r2_port}"
+    this_port = f"[::]:4666"
     server.add_insecure_port(this_port)
     server.start()
     server.wait_for_termination()
@@ -150,9 +150,9 @@ def http_launch(port1):
     server.serve_forever()
 
 
-def grpc_launch(r1_port):
+def grpc_launch():
     logging.basicConfig()
-    create_rpc_serve(r1_port)
+    create_rpc_serve()
 
 
 if __name__ == '__main__':
@@ -161,4 +161,4 @@ if __name__ == '__main__':
     r_port = port - DEFAULT_PORT + RPC_PORT  # rpc服务的端口
     with concurrent.futures.ThreadPoolExecutor() as executor:  # 多线程启动HTTP和rpc服务
         executor.submit(http_launch, port)
-        executor.submit(grpc_launch, r_port)
+        executor.submit(grpc_launch)
